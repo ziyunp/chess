@@ -24,6 +24,27 @@ int main() {
 
 	cb.submitMove("F8", "B4");
 	cout << '\n';
+	/* test cases */
+	cb.submitMove("E7", "E6");
+	cout << '\n';
+
+	cb.submitMove("D4", "D5");
+	cout << '\n';
+
+	cb.submitMove("F8", "B4");
+	cout << '\n';
+
+	cb.submitMove("D1", "C3");
+	cout << '\n';
+
+	cb.submitMove("E8", "E7");
+	cout << '\n';
+
+	cb.submitMove("E1", "D1");
+	cout << '\n';
+
+	cb.submitMove("D8", "E8");
+	cout << '\n';
 
 	cout << "=========================\n";
 	cout << "Alekhine vs. Vasic (1931)\n";
