@@ -4,7 +4,7 @@ using namespace std;
 class ChessPiece;
 
 class ChessBoard {
-  ChessPiece* board[MAX_RANGE][MAX_RANGE] = {};
+  ChessPiece * board[MAX_RANGE][MAX_RANGE] = {};
 
   void setPieces(string player);
   /* Used to keep track of the player's turn - even number = White's turn, odd = Black's turn */
@@ -25,6 +25,9 @@ class ChessBoard {
    * */
   bool isValidDestination(const char * dest, string currPlayer, bool& capture);
   
+  bool isPathClear(const char * src, const char * dest, bool capture = false);
+  bool isValidMove(const char * src, const char * dest, bool capture, string player);
+
   /* 
    * If dest is occupied, 'capture' the piece - delete the ChessPiece instance
    * Move the piece on the src square to the dest square
@@ -40,7 +43,9 @@ class ChessBoard {
 
   bool isStalemate(string player);
 
-  void getKingPosition(string player, int& kingRank, int&kingFile);
+  bool hasPossibleMoves(const char * piece);
+
+  void getKingPosition(string player, int& kingRank, int&kingFile, ChessPiece * cb[][MAX_RANGE]);
 
  public:
   ChessBoard ();

@@ -11,37 +11,61 @@ int main() {
 	ChessBoard cb;
 	cout << '\n';
 
-	cb.submitMove("D7", "D6");
+	cb.submitMove("E2", "E3");
 	cout << '\n';
 
-	cb.submitMove("D4", "H6");
+	cb.submitMove("A7", "A5");
 	cout << '\n';
 
-	cb.submitMove("D2", "D4");
+	cb.submitMove("D1", "H5");
 	cout << '\n';
 
-	cb.submitMove("F8", "B4");
-	cout << '\n';
-	/* test cases */
-	cb.submitMove("E7", "E6");
+	cb.submitMove("A8", "A6");
 	cout << '\n';
 
-	cb.submitMove("D4", "D5");
+	cb.submitMove("H5", "A5");
 	cout << '\n';
 
-	cb.submitMove("F8", "B4");
+	cb.submitMove("H7", "H5");
 	cout << '\n';
 
-	cb.submitMove("D1", "C3");
+	cb.submitMove("H2", "H4");
 	cout << '\n';
 
-	cb.submitMove("E8", "E7");
+	cb.submitMove("A6", "H6");
 	cout << '\n';
 
-	cb.submitMove("E1", "D1");
+	cb.submitMove("A5", "C7");
 	cout << '\n';
 
-	cb.submitMove("D8", "E8");
+	cb.submitMove("F7", "F6");
+	cout << '\n';
+
+	cb.submitMove("C7", "D7");
+	cout << '\n';
+
+	cb.submitMove("E8", "F7");
+	cout << '\n';
+
+	cb.submitMove("D7", "B7");
+	cout << '\n';
+
+	cb.submitMove("D8", "D3");
+	cout << '\n';
+
+	cb.submitMove("B7", "B8");
+	cout << '\n';
+
+	cb.submitMove("D3", "H7");
+	cout << '\n';
+
+	cb.submitMove("B8", "C8");
+	cout << '\n';
+
+	cb.submitMove("F7", "G6");
+	cout << '\n';
+
+	cb.submitMove("C8", "E6");
 	cout << '\n';
 
 	cout << "=========================\n";
