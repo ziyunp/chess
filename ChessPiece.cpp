@@ -22,7 +22,7 @@ bool Pawn::rules(const char * src, const char * dest, struct move_info info, boo
       return false;
     /*Pawn can move one or two steps from its starting position */
     stepCount = dRank - sRank;
-    if (sRank == 1) {
+    if (!moved) {
       if (stepCount > 2)
 	      return false;
       if (stepCount == 2) {
@@ -39,7 +39,7 @@ bool Pawn::rules(const char * src, const char * dest, struct move_info info, boo
     if (dRank >= sRank)
       return false;
     stepCount = sRank - dRank;
-    if (sRank == 6) {
+    if (!moved) {
       if (stepCount > 2)
 	      return false;
       if (stepCount == 2) {
@@ -78,8 +78,8 @@ bool Rook::rules(const char * src, const char * dest, struct move_info info, boo
   /* Rook moves vertical- / horizontally */
   if (dFile != sFile && dRank != sRank)
     return false;
-  /* vertical move */
   if (dFile == sFile) {
+    /* Vertical move */
     stepCount = dRank > sRank ? dRank - sRank : sRank - dRank;
     int i = 0;
     for(int rank = sRank; i < stepCount; dRank > sRank ? rank++ : rank--) {
@@ -90,6 +90,7 @@ bool Rook::rules(const char * src, const char * dest, struct move_info info, boo
       }
     }
   } else if (dRank == sRank) {
+    /* Horizontal move */
     stepCount = dFile > sFile ? dFile - sFile : sFile - dFile;
     int i = 0;
     for(int file = sFile; i < stepCount; dFile > sFile ? file++ : file--) {
@@ -244,13 +245,26 @@ bool King::rules(const char * src, const char * dest, struct move_info info, boo
   int & stepCount = info.stepCount ? *info.stepCount : steps;
   /* King can only move 1 step in any direction */
   if (dFile == sFile) {
-    /* Horizontal move */
+    /* Vertical move */
     stepCount = dRank > sRank ? dRank - sRank : sRank - dRank;
     if (stepCount != 1)
       return false;
   } else if (dRank == sRank) {
-    /* Vertical move */
+    /* Horizontal move */
     stepCount = dFile > sFile ? dFile - sFile : sFile - dFile;
+    /* Castling */
+    if (stepCount == 2 && !moved && !capture) {
+      castling = true;
+      int i = 0;
+      for(int file = sFile; i < stepCount; dFile > sFile ? file++ : file--) {
+        /* Ignore the source file */
+        if (file != sFile) {
+          info.fileSteps[i] = file;
+          info.rankSteps[i++] = dRank;
+        }
+      }
+      return true;
+    }
     if (stepCount != 1)
       return false;    
   } else {
@@ -267,17 +281,4 @@ bool King::rules(const char * src, const char * dest, struct move_info info, boo
   return true;
 };
 
-// void King::getAllPossibleMoves(const char * src, int possibleRank[], int possibleFile[]) {
-//   int sRank, sFile;
-//   getIndex(src, sRank, sFile);
-//   int r = 0, f = 0;
-//   /* King can move one square from its position, hence: -1, +0, +1 */
-//   for (int i = 0; i < moveRange; i++) {
-//     /* Ensure that the square is not out of range */
-//     if (sRank - (i - 1) >= 0 || sRank - (i - 1) < MAX_RANGE) 
-//       possibleRank[r++] = sRank - (i - 1);
-//     if (sFile - (i - 1) >= 0 || sFile - (i - 1) < MAX_RANGE) 
-//       possibleFile[f++] = sFile - (i - 1);
-//   };
-//   int possibleMoveCount = r * f;
-// };
+

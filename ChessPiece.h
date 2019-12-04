@@ -12,13 +12,14 @@ class ChessPiece{
  public:
   string player;
   string type;
+  // TODO: need these?
   int moveRange = 0;
   int maxPossiblePositions = 0;
+  bool moved = false;
+  bool castling = false;
 
   ChessPiece(string player, string const type);
-  
-  // virtual bool rules(const char * src, const char * dest, int rankSteps[], int fileSteps[], int& stepCount, bool capture = false) = 0;
-  
+    
   virtual bool rules(const char * src, const char * dest, struct move_info info, bool capture = false) = 0;
 };
 
@@ -27,8 +28,6 @@ class Pawn : public ChessPiece {
  public:
   
   Pawn(string player);
-
-  // virtual bool rules(const char * src, const char * dest, int rankSteps[], int fileSteps[], int& stepCount, bool capture = false);
   
   virtual bool rules(const char * src, const char * dest, struct move_info info, bool capture = false);
 };
@@ -81,5 +80,4 @@ class King : public ChessPiece {
 
   virtual bool rules(const char * src, const char * dest, struct move_info info, bool capture = false);
  
-  // virtual void getAllPossibleMoves(const char * src);
 };
