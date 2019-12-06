@@ -1,11 +1,11 @@
 #include <iostream>
 #include "ChessPiece.h"
-#include "general.h"
 using namespace std;
 
 ChessPiece::ChessPiece(string player, string const type) : player(player), type(type) {};
 
 Pawn::Pawn(string player) : ChessPiece(player, PAWN) {
+  //TODO: needed?
   moveRange = 1;
   maxPossiblePositions = 3;
 
@@ -63,6 +63,7 @@ bool Pawn::rules(const char * src, const char * dest, struct move_info info, boo
   return true;
 };
 
+// ~Pawn::Pawn() {};
 
 Rook::Rook(string player) : ChessPiece(player, ROOK) {
   moveRange = MAX_RANGE;

@@ -1,32 +1,22 @@
 #include <iostream>
 #include <cstring>
 #include "ChessBoard.h"
-#include "general.h"
+
 using namespace std;
 
 ChessBoard::ChessBoard() {
   resetBoard();
 }
 
-void ChessBoard::resetBoard() {
-  int rank, file;
-  
+void ChessBoard::resetBoard() {  
   cout << "A new chess game is started!\n";
 
   moveCount = 0;
   
-  for (rank = 0; rank < MAX_RANGE; rank++) {
-    for (file = 0; file < MAX_RANGE; file++) {
-      if(board[rank][file] != NULL) {
-        delete board[rank][file];
-        board[rank][file] = NULL;
-      }
-    }
-  }
+  cleanUp();
 
   setPieces(WHITE);
   setPieces(BLACK);
-
 };
 
 void ChessBoard::setPieces(string player) {
@@ -63,7 +53,7 @@ void ChessBoard::submitMove(const char * src, const char * dest) {
       /* Check if the opponent king is in check */
       string oppPlayer = currPlayer == WHITE ? BLACK : WHITE;
       if (isInCheck(oppPlayer, board)) {
-        if(playerHasNoPossibleMoves(oppPlayer)) {
+        if(!playerHasPossibleMoves(oppPlayer)) {
           cout << oppPlayer << " is in checkmate\n";
           return;
         };
@@ -71,7 +61,7 @@ void ChessBoard::submitMove(const char * src, const char * dest) {
         /* Check is the opponent is in checkmate */
       } else {
         /* If not in check, check is the game in stalemate */
-        if (playerHasNoPossibleMoves(oppPlayer)) {
+        if (!playerHasPossibleMoves(oppPlayer)) {
           cout << "Stalemate!\n";
           return;
         }
@@ -80,7 +70,6 @@ void ChessBoard::submitMove(const char * src, const char * dest) {
       int rank, file;
       getIndex(src, rank, file);
       cout << currPlayer << "'s " << board[rank][file]->type << " cannot move to " << dest << "!\n";
-
     }
   }
 };
@@ -158,7 +147,9 @@ void ChessBoard::makeMove(const char * src, const char * dest, bool castling) {
 
     cout << board[dRank][dFile]->player << "'s " << board[dRank][dFile]->type << " castles from " << src << " to " << dest << endl;
     cout << board[dRank][cFile]->player << "'s " << board[dRank][cFile]->type << " castles from " << rookSrc << " to " << rookDest;
-
+    
+    delete rookSrc;
+    delete rookDest;
   } else {
     cout << board[dRank][dFile]->player << "'s " << board[dRank][dFile]->type << " moves from " << src << " to " << dest;
     
@@ -213,19 +204,22 @@ bool ChessBoard::isInCheck(string player, ChessPiece * cb[][MAX_RANGE]) {
             if (cb[rankSteps[i]][fileSteps[i]] != NULL)
               break;
           }
-
           /* No pieces blocking between */
-          if (i == stepCount - 1 || stepCount <= 1)             
+          if (i == stepCount - 1 || stepCount <= 1) {         
+            delete kingPosition;
+            delete piecePosition;
             return true;
-          
+          }
         }
+        delete piecePosition;
       }
     }
   }
+  delete kingPosition;
   return false;
 };
 
-bool ChessBoard::playerHasNoPossibleMoves(string player) {
+bool ChessBoard::playerHasPossibleMoves(string player) {
   /* Loop through all pieces that belong to this player */
   int rank, file;
   for (rank = 0; rank < MAX_RANGE; rank++) {
@@ -233,16 +227,19 @@ bool ChessBoard::playerHasNoPossibleMoves(string player) {
       if(board[rank][file] != NULL && board[rank][file]->player == player) {
         char * piecePosition = getCoord(rank, file);
         /* If >= 1 piece has possible moves, then it is not in stalemate */
-        if (hasPossibleMoves(piecePosition))
-          return false;
+        if (pieceHasPossibleMoves(piecePosition)) {
+          delete piecePosition;
+          return true;
+        }
+        delete piecePosition;
       }
     }
   }
   /* Looped through all pieces and none has possible moves*/
-  return true;
+  return false;
 };
 
-bool ChessBoard::hasPossibleMoves(const char * piece) {
+bool ChessBoard::pieceHasPossibleMoves(const char * piece) {
   int pieceRank, pieceFile;
   getIndex(piece, pieceRank, pieceFile);
   string player = board[pieceRank][pieceFile]->player;
@@ -257,8 +254,11 @@ bool ChessBoard::hasPossibleMoves(const char * piece) {
         bool capture = board[rank][file] == NULL ? false : true;
         bool castling = false;
         /* Check if moving to this square is valid */
-        if(isValidMove(piece, dest, capture, castling, player))
+        if(isValidMove(piece, dest, capture, castling, player)) {
+          delete dest;
           return true;
+        }
+        delete dest;
       }
     }
   }
@@ -284,15 +284,17 @@ bool ChessBoard::isValidMove(const char * src, const char * dest, bool capture, 
   if (isPathClear(src, dest, capture)) {
     int sRank, sFile;
     getIndex(src, sRank, sFile);
-    ChessPiece * piece = board[sRank][sFile];
-    if (piece->type == KING && piece->castling) {
-      piece->castling = false;
-      // castling function
-      if(isValidCastling(src, dest)) {
-        castling = true;
-        return true;
+    if (board[sRank][sFile]->type == KING) {
+      King * king_ptr = static_cast<King*> (board[sRank][sFile]);
+      if (king_ptr->castling) {
+        // reset castling data member
+        king_ptr->castling = false;
+        if(isValidCastling(src, dest)) {
+          castling = true;
+          return true;
+        }
+        return false;
       }
-      return false;
     }
 
     /* invalid move if this move will put own's king in check */
@@ -355,6 +357,7 @@ bool ChessBoard::isValidCastling(const char * kingPosition, const char * dest) {
       // simulate moving king to each square and check whether is in check?
       ChessPiece * sim_board[MAX_RANGE][MAX_RANGE];
       simulateMove(kingPosition, currSquare, sim_board);
+      delete currSquare;
       if (isInCheck(player, sim_board))
         return false;
     }
@@ -364,9 +367,25 @@ bool ChessBoard::isValidCastling(const char * kingPosition, const char * dest) {
       // simulate moving king to each square and check whether is in check?
       ChessPiece * sim_board[MAX_RANGE][MAX_RANGE];
       simulateMove(kingPosition, currSquare, sim_board);
+      delete currSquare;
       if (isInCheck(player, sim_board))
         return false;
     }
   }
   return true;
+}
+
+void ChessBoard::cleanUp() {
+  for (int rank = 0; rank < MAX_RANGE; rank++) {
+    for (int file = 0; file < MAX_RANGE; file++) {
+      if(board[rank][file] != NULL) {
+        delete board[rank][file];
+        board[rank][file] = NULL;
+      }
+    }
+  }
+}
+
+ChessBoard::~ChessBoard() {
+  cleanUp();
 }

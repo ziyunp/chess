@@ -7,7 +7,7 @@ ChessMain.o: ChessMain.cpp ChessBoard.h
 ChessBoard.o: ChessBoard.cpp ChessBoard.h ChessPiece.h
 	g++ -g -Wall -c ChessBoard.cpp
 
-ChessPiece.o: ChessPiece.cpp ChessPiece.h general.h constants.h
+ChessPiece.o: ChessPiece.cpp ChessPiece.h general.h
 	g++ -g -Wall -c ChessPiece.cpp
 
 general.o: general.cpp general.h

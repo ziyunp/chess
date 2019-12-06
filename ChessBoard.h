@@ -6,9 +6,10 @@ class ChessPiece;
 class ChessBoard {
   ChessPiece * board[MAX_RANGE][MAX_RANGE] = {};
 
-  void setPieces(string player);
   /* Used to keep track of the player's turn - even number = White's turn, odd = Black's turn */
   int moveCount = 0;
+
+  void setPieces(string player);
 
   /* 
    * This function checks:
@@ -17,6 +18,7 @@ class ChessBoard {
    * whether it is the player's turn to move
    * */
   bool isValidSource(const char * src, string currPlayer);
+
   /* 
    * This function checks:
    * the range of the dest coordinates,
@@ -41,20 +43,23 @@ class ChessBoard {
 
   bool isInCheck(string player, ChessPiece * cb[][MAX_RANGE]);
 
-  bool playerHasNoPossibleMoves(string player);
+  bool playerHasPossibleMoves(string player);
 
-  bool hasPossibleMoves(const char * piece);
+  bool pieceHasPossibleMoves(const char * piece);
 
   void getKingPosition(string player, int& kingRank, int&kingFile, ChessPiece * cb[][MAX_RANGE]);
 
   bool isValidCastling(const char * kingPosition, const char * dest);
 
+  void cleanUp();
+
  public:
 
-  ChessBoard ();
+  ChessBoard();
   
   void resetBoard();
   
   void submitMove(const char * src, const char * dest);
-  
+
+  ~ChessBoard();
 };
