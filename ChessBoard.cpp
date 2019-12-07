@@ -43,7 +43,6 @@ void ChessBoard::submitMove(const char * src, const char * dest) {
   // Checking which player's turn - White's turn when moveCount is even 
   string currPlayer = moveCount % 2 ? BLACK : WHITE;
 
-  // These will be set to true if the piece is capturing / castling
   bool capture = false, castling = false;
 
   // Check whether src and dest are valid
@@ -68,7 +67,7 @@ void ChessBoard::submitMove(const char * src, const char * dest) {
       } else {
         // If not in check, check if the game is in stalemate
         if (!playerHasPossibleMoves(oppPlayer)) {
-          cout << "Stalemate!\n";
+          cout << "The game is in stalemate!\n";
           return;
         }
       }
@@ -141,7 +140,7 @@ bool ChessBoard::isValidMove(const char * src, const char * dest, bool capture, 
         return false;
       }
     }
-    // Simulate move - invalid if this move will put own's king in check
+    // Simulate move and check if this move will put own's king in check
     ChessPiece * sim_board[MAX_RANGE][MAX_RANGE];
     simulateMove(src, dest, sim_board);
     if (isInCheck(player, sim_board))
@@ -157,10 +156,6 @@ bool ChessBoard::isPathClear(const char * src, const char * dest, bool capture, 
   int sRank, sFile;
   getIndex(src, sRank, sFile);
   
-  /* 
-    Stores the path taken by the piece to move from src to dest.
-    Each coord (rank, file) along the path is stored in rankSteps and fileSteps respectively.
-  */
   int rankSteps[MAX_RANGE], fileSteps[MAX_RANGE], stepCount = 0;
 
   move_info moveInfo;
