@@ -46,11 +46,11 @@ void ChessBoard::submitMove(const char * src, const char * dest) {
   bool captureOpponent = false, castling = false;
 
   if(isValidSource(src, currPlayer) && isValidDestination(dest, currPlayer, captureOpponent)) {    
-    /* Check if the squares between src and dest are empty */
+    // Check if the squares between src and dest are empty
     if(isValidMove(src, dest, captureOpponent, castling, currPlayer)) {
       makeMove(src, dest, castling);
 
-      /* Check if the opponent king is in check */
+      // Check if the opponent king is in check
       string oppPlayer = currPlayer == WHITE ? BLACK : WHITE;
       if (isInCheck(oppPlayer, board)) {
         if(!playerHasPossibleMoves(oppPlayer)) {
@@ -58,9 +58,9 @@ void ChessBoard::submitMove(const char * src, const char * dest) {
           return;
         };
         cout << oppPlayer << " is in check\n";
-        /* Check is the opponent is in checkmate */
+        // Check is the opponent is in checkmate
       } else {
-        /* If not in check, check is the game in stalemate */
+        // If not in check, check is the game in stalemate
         if (!playerHasPossibleMoves(oppPlayer)) {
           cout << "Stalemate!\n";
           return;
@@ -74,7 +74,7 @@ void ChessBoard::submitMove(const char * src, const char * dest) {
   }
 };
 
-bool ChessBoard::isValidSource(const char * src, string currPlayer) {
+bool ChessBoard::isValidSource(const char * src, string player) {
   int sRank, sFile; 
   getIndex(src, sRank, sFile);
 
@@ -88,14 +88,14 @@ bool ChessBoard::isValidSource(const char * src, string currPlayer) {
     return false;
   }
 
-  if(board[sRank][sFile]->player != currPlayer) {
+  if(board[sRank][sFile]->player != player) {
     cout << "It is not " << board[sRank][sFile]->player << "'s turn to move!\n";
     return false;
   }
   return true;
 };
 
-bool ChessBoard::isValidDestination(const char * dest, string currPlayer, bool& capture) {
+bool ChessBoard::isValidDestination(const char * dest, string player, bool& capture) {
   int dRank, dFile;
   getIndex(dest, dRank, dFile);
 
@@ -107,7 +107,7 @@ bool ChessBoard::isValidDestination(const char * dest, string currPlayer, bool& 
   if(board[dRank][dFile] == NULL)
     return true;
 
-  if(board[dRank][dFile]->player != currPlayer) {
+  if(board[dRank][dFile]->player != player) {
     capture = true;
     return true;
   }
@@ -121,7 +121,7 @@ void ChessBoard::makeMove(const char * src, const char * dest, bool castling) {
   getIndex(dest, dRank, dFile);
 
   string capturedPlayer = "", capturedPiece = "";
-  /* capture the piece on the destination square */  
+  // capture the piece on the destination square  
   if (board[dRank][dFile] != NULL) {
     capturedPlayer = board[dRank][dFile]->player;
     capturedPiece = board[dRank][dFile]->type;
@@ -166,14 +166,14 @@ void ChessBoard::simulateMove(const char * src, const char * dest, ChessPiece * 
   getIndex(src, sRank, sFile);
   getIndex(dest, dRank, dFile);
 
-  /* Copy the real board into the simulated board */
+  // Copy the real board into the simulated board 
   int rank, file;
   for (rank = 0; rank < MAX_RANGE; rank++) {
     for (file = 0; file < MAX_RANGE; file++) {
       sim_board[rank][file] = board[rank][file];
     }
   }
-  /* Make move on the sim_board */
+  // Make move on the sim_board 
   sim_board[dRank][dFile] = sim_board[sRank][sFile];
   sim_board[sRank][sFile] = NULL;
 };
@@ -191,20 +191,20 @@ bool ChessBoard::isInCheck(string player, ChessPiece * cb[][MAX_RANGE]) {
   moveInfo.fileSteps = &fileSteps[0];
   moveInfo.stepCount = &stepCount;
 
-  /* Loop through every square of the chessboard*/
+  // Loop through every square of the chessboard
   for (rank = 0; rank < MAX_RANGE; rank++) {
     for (file = 0; file < MAX_RANGE; file++) {
-      /* For each opponent piece, check if the piece is checking the king */
+      // For each opponent piece, check if the piece is checking the king 
       if(cb[rank][file] != NULL && cb[rank][file]->player != player) {
         char * piecePosition = getCoord(rank, file);
-        /* Check if the piece can move towards the king */
+        // Check if the piece can move towards the king 
         if (cb[rank][file]->rules(piecePosition, kingPosition, moveInfo, capture)) {
           int i;
           for (i = 0; i < stepCount - 1; i++) {
             if (cb[rankSteps[i]][fileSteps[i]] != NULL)
               break;
           }
-          /* No pieces blocking between */
+          // No pieces blocking between 
           if (i == stepCount - 1 || stepCount <= 1) {         
             delete kingPosition;
             delete piecePosition;
@@ -220,13 +220,13 @@ bool ChessBoard::isInCheck(string player, ChessPiece * cb[][MAX_RANGE]) {
 };
 
 bool ChessBoard::playerHasPossibleMoves(string player) {
-  /* Loop through all pieces that belong to this player */
+  // Loop through all pieces that belong to this player
   int rank, file;
   for (rank = 0; rank < MAX_RANGE; rank++) {
     for (file = 0; file < MAX_RANGE; file++) {
       if(board[rank][file] != NULL && board[rank][file]->player == player) {
         char * piecePosition = getCoord(rank, file);
-        /* If >= 1 piece has possible moves, then it is not in stalemate */
+        // If >= 1 piece has possible moves, then it is not in stalemate
         if (pieceHasPossibleMoves(piecePosition)) {
           delete piecePosition;
           return true;
@@ -235,7 +235,7 @@ bool ChessBoard::playerHasPossibleMoves(string player) {
       }
     }
   }
-  /* Looped through all pieces and none has possible moves*/
+  // Looped through all pieces and none has possible moves*/
   return false;
 };
 
@@ -244,16 +244,16 @@ bool ChessBoard::pieceHasPossibleMoves(const char * piece) {
   getIndex(piece, pieceRank, pieceFile);
   string player = board[pieceRank][pieceFile]->player;
   int rank, file;
-  /* Loop through all squares to search for possible moves */
+  // Loop through all squares to search for possible moves
   // TODO: maybe reduce the scope of search with moveRange
   for (rank = 0; rank < MAX_RANGE; rank++) {
     for (file = 0; file < MAX_RANGE; file++) {
-      /* Possible to move to an empty square or to capture an opponent */
+      // Possible to move to an empty square or to capture an opponent
       if(board[rank][file] == NULL || board[rank][file]->player != player) {
         char * dest = getCoord(rank, file);
         bool capture = board[rank][file] == NULL ? false : true;
         bool castling = false;
-        /* Check if moving to this square is valid */
+        // Check if moving to this square is valid
         if(isValidMove(piece, dest, capture, castling, player)) {
           delete dest;
           return true;
@@ -262,7 +262,7 @@ bool ChessBoard::pieceHasPossibleMoves(const char * piece) {
       }
     }
   }
-  /* Completed loop without finding a valid move */
+  // Completed loop without finding a valid move
   return false;
 };
 
@@ -297,16 +297,16 @@ bool ChessBoard::isValidMove(const char * src, const char * dest, bool capture, 
       }
     }
 
-    /* invalid move if this move will put own's king in check */
-    /* Simulate move */
+    // invalid move if this move will put own's king in check
+    // Simulate move
     ChessPiece * sim_board[MAX_RANGE][MAX_RANGE];
     simulateMove(src, dest, sim_board);
     if (isInCheck(player, sim_board))
       return false;
-    /* Valid move if path is clear and will not lead to in check */
+    // Valid move if path is clear and will not lead to in check
     return true;
   }
-  /* Path is not clear */
+  // Path is not clear
   return false;
 }
 
@@ -319,7 +319,7 @@ bool ChessBoard::isPathClear(const char * src, const char * dest, bool capture) 
   moveInfo.rankSteps = &rankSteps[0];
   moveInfo.fileSteps = &fileSteps[0];
   moveInfo.stepCount = &stepCount;
-  /* Check if the squares between src and dest are empty */
+  // Check if the squares between src and dest are empty
   if(board[sRank][sFile]->rules(src, dest, moveInfo, capture)) {
     // cout << "stepcount: " << stepCount << endl;
     for (int i = 0; i < stepCount - 1; i++) {
