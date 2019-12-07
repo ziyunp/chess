@@ -1,5 +1,4 @@
 #include "ChessPiece.h"
-using namespace std;
 
 class ChessPiece;
 
@@ -30,7 +29,7 @@ class ChessBoard {
    * whether it is the player's turn to move
    * Parameter: src, player 
    * */
-  bool isValidSource(const char * src, string player);
+  bool isValidSource(const char * src, std::string player);
 
   /* 
    * This function checks:
@@ -39,7 +38,7 @@ class ChessBoard {
    * if dest not empty, whether the square is occupied by the opponent
    * if occupied by opponent, this function sets the parameter 'capture' to true
    * */
-  bool isValidDestination(const char * dest, string player, bool& capture);
+  bool isValidDestination(const char * dest, std::string player, bool& capture);
   
   /* 
    * This function checks:
@@ -47,7 +46,7 @@ class ChessBoard {
    * if the move will lead to a check - in which case the move is illegal
    * if the moving piece is a King attempting castling, whether it is legal
    * */
-  bool isValidMove(const char * src, const char * dest, bool capture, bool& castling, string player);
+  bool isValidMove(const char * src, const char * dest, bool capture, bool& castling, std::string player);
 
   bool isPathClear(const char * src, const char * dest, bool capture = false);
 
@@ -60,13 +59,13 @@ class ChessBoard {
   
   void simulateMove(const char * src, const char * dest, ChessPiece * sim_board[][MAX_RANGE]);
 
-  bool isInCheck(string player, ChessPiece * cb[][MAX_RANGE]);
+  bool isInCheck(std::string player, ChessPiece * cb[][MAX_RANGE]);
 
-  bool playerHasPossibleMoves(string player);
+  bool playerHasPossibleMoves(std::string player);
 
   bool pieceHasPossibleMoves(const char * piece);
 
-  void getKingPosition(string player, int& kingRank, int&kingFile, ChessPiece * cb[][MAX_RANGE]);
+  void getKingPosition(std::string player, int& kingRank, int&kingFile, ChessPiece * cb[][MAX_RANGE]);
 
   bool isValidCastling(const char * kingPosition, const char * dest);
 
