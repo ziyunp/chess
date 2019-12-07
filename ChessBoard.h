@@ -1,3 +1,4 @@
+#include <string>
 #include "ChessPiece.h"
 
 class ChessPiece;

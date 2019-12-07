@@ -1,3 +1,4 @@
+#include <string>
 #include "general.h"
 
 struct move_info {
