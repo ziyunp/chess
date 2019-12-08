@@ -81,10 +81,16 @@ void ChessBoard::submitMove(const char * src, const char * dest) {
 
 bool ChessBoard::isValidSource(const char * src, string player) {
   int sRank, sFile; 
-  getIndex(src, sRank, sFile);
+  try {
+    getIndex(src, sRank, sFile);
+  } catch (const string & e) {
+    cout << e << endl;
+    return false;
+  }
+
   ChessPiece * piece = board[sRank][sFile];
   if (sRank < 0 || sRank > 7 || sFile < 0 || sFile > 7) {
-    cout << "Source square " << src << " out of range. Rank must be between 1-8 and file must be between A-H\n";
+    cout << "Source square \"" << src << "\" out of range. Rank must be between 1-8 and file must be between A-H\n";
     return false;
   }
   
@@ -102,10 +108,16 @@ bool ChessBoard::isValidSource(const char * src, string player) {
 
 bool ChessBoard::isValidDestination(const char * dest, string player, bool& capture) {
   int dRank, dFile;
-  getIndex(dest, dRank, dFile);
+  try {
+    getIndex(dest, dRank, dFile);
+  } catch (const string & e) {
+    cout << e << endl;
+    return false;
+  }
+  
   ChessPiece * piece = board[dRank][dFile];
   if (dRank < 0 || dRank > 7 || dFile < 0 || dFile > 7) {
-    cout << "Destination square " << dest << " out of range. Rank must be between 1-8 and file must be between A-H\n";
+    cout << "Destination square \"" << dest << "\" out of range. Rank must be between 1-8 and file must be between A-H\n";
     return false;
   }
   // Destination square is empty
@@ -289,12 +301,14 @@ void ChessBoard::makeMove(const char * src, const char * dest, bool castling) {
     // Gets the src and dest coordinates of the rook for an informative output
     char * rookSrc = getCoord(dRank, rookFile);
     char * rookDest = getCoord(dRank, cFile);
-    
+
     cout << movingPiece->player << "'s " << movingPiece->type << " castles from " << src << " to " << dest << endl;
     cout << rook->player << "'s " << rook->type << " castles from " << rookSrc << " to " << rookDest;
 
     delete rookSrc;
     delete rookDest;
+    rookSrc = NULL;
+    rookDest = NULL;
   } else {
     cout << movingPiece->player << "'s " << movingPiece->type << " moves from " << src << " to " << dest;
     
@@ -330,7 +344,6 @@ bool ChessBoard::pieceHasPossibleMoves(const char * piecePosition) {
   getIndex(piecePosition, pieceRank, pieceFile);
   string player = board[pieceRank][pieceFile]->player;
   // Loop through every square to search for possible moves
-  // TODO: maybe reduce the scope of search with moveRange
   for (int rank = 0; rank < MAX_RANGE; rank++) {
     for (int file = 0; file < MAX_RANGE; file++) {
       ChessPiece * piece = board[rank][file];

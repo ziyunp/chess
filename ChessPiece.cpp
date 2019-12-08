@@ -3,11 +3,44 @@ using namespace std;
 
 ChessPiece::ChessPiece(string player, string type) : player(player), type(type) {};
 
-Pawn::Pawn(string player) : ChessPiece(player, PAWN) {
-  //TODO: needed?
-  // moveRange = 1;
-  // maxPossiblePositions = 3;
+void ChessPiece::getVerticalPath (int sRank, int dRank, int file, struct move_info info) {
+  *info.stepCount = dRank > sRank ? dRank - sRank : sRank - dRank;
+  int i = 0;
+  for(int rank = sRank; i < *info.stepCount; dRank > sRank ? rank++ : rank--) {
+    if (rank != sRank) {
+      info.rankSteps[i] = rank;
+      info.fileSteps[i] = file;
+      ++i;
+    }
+  }
 };
+
+void ChessPiece::getHorizontalPath (int sFile, int dFile, int rank, struct move_info info) {
+  *info.stepCount = dFile > sFile ? dFile - sFile : sFile - dFile;
+  int i = 0;
+  for(int file = sFile; i < *info.stepCount; dFile > sFile ? file++ : file--) {
+    if (file != sFile) {  
+      info.fileSteps[i] = file;
+      info.rankSteps[i] = rank;
+      ++i;
+    }
+  }
+};
+
+void ChessPiece::getDiagonalPath(int sRank, int dRank, int sFile, int dFile, struct move_info info) {
+  int i = 0;
+  for (int rank = sRank; i < *info.stepCount; dRank > sRank ? rank++ : rank--) {
+    if (rank != sRank)
+      info.rankSteps[i++] = rank;  
+  }
+  int j = 0;
+  for (int file = sFile; j < *info.stepCount; dFile > sFile ? file++ : file--) {
+    if (file != sFile)
+      info.fileSteps[j++] = file;  
+  }
+};
+
+Pawn::Pawn(string player) : ChessPiece(player, PAWN) {};
 
 bool Pawn::rules(const char * src, const char * dest, struct move_info info, bool capture) {
   int sRank, sFile, dRank, dFile;
@@ -60,50 +93,24 @@ bool Pawn::rules(const char * src, const char * dest, struct move_info info, boo
   return true;
 };
 
-Rook::Rook(string player) : ChessPiece(player, ROOK) {
-  // moveRange = MAX_RANGE;
-  // maxPossiblePositions = 14;
-};
+Rook::Rook(string player) : ChessPiece(player, ROOK) {};
 
 bool Rook::rules(const char * src, const char * dest, struct move_info info, bool capture) {
   int sRank, sFile, dRank, dFile;
   getIndex(src, sRank, sFile);
   getIndex(dest, dRank, dFile);
-  int & stepCount = *info.stepCount;
   // Rook moves vertical- / horizontally
   if (dFile != sFile && dRank != sRank)
     return false;
   if (dFile == sFile) {
-    // Vertical move
-    stepCount = dRank > sRank ? dRank - sRank : sRank - dRank;
-    int i = 0;
-    for(int rank = sRank; i < stepCount; dRank > sRank ? rank++ : rank--) {
-      // Assign to rankSteps and fileSteps the index of steps btw src and dest
-      if (rank != sRank) {
-        info.rankSteps[i] = rank;
-        info.fileSteps[i] = dFile;
-        ++i;
-      }
-    }
+    getVerticalPath (sRank, dRank, dFile, info);
   } else if (dRank == sRank) {
-    // Horizontal move
-    stepCount = dFile > sFile ? dFile - sFile : sFile - dFile;
-    int i = 0;
-    for(int file = sFile; i < stepCount; dFile > sFile ? file++ : file--) {
-      if (file != sFile) {  
-        info.fileSteps[i] = file;
-        info.rankSteps[i] = dRank;
-        ++i;
-      }
-    }
+    getHorizontalPath (sFile, dFile, dRank, info);
   }
   return true;
 };
 
-Knight::Knight(string player) : ChessPiece(player, KNIGHT) {
-  // moveRange = 5; 
-  // maxPossiblePositions = 8;
-};
+Knight::Knight(string player) : ChessPiece(player, KNIGHT) {};
 
 bool Knight::rules(const char * src, const char * dest, struct move_info info, bool capture) {
   int sRank, sFile, dRank, dFile;
@@ -126,16 +133,12 @@ bool Knight::rules(const char * src, const char * dest, struct move_info info, b
   return true;
 };
 
-Bishop::Bishop(string player) : ChessPiece(player, BISHOP) {
-  // moveRange = MAX_RANGE;
-  // maxPossiblePositions = 14;
-};
+Bishop::Bishop(string player) : ChessPiece(player, BISHOP) {};
 
 bool Bishop::rules(const char * src, const char * dest, struct move_info info, bool capture) {
   int sRank, sFile, dRank, dFile;
   getIndex(src, sRank, sFile);
   getIndex(dest, dRank, dFile);
-  int & stepCount = *info.stepCount;
   
   // Bishop moves diagonally
   if (dFile == sFile || dRank == sRank)
@@ -147,86 +150,38 @@ bool Bishop::rules(const char * src, const char * dest, struct move_info info, b
   // The horizontal and vertical distance must be equal for diagonal movement
   if (rankDistance != fileDistance)
     return false;
+ 
+  *info.stepCount = rankDistance;
+  getDiagonalPath(sRank, dRank, sFile, dFile, info);
 
-  stepCount = rankDistance;
-  int i = 0;
-  for (int rank = sRank; i < stepCount; dRank > sRank ? rank++ : rank--) {
-    // Assign to rankSteps and fileSteps the index of steps btw src and dest
-    if (rank != sRank)
-      info.rankSteps[i++] = rank;  
-  }
-
-  int j = 0;
-  for (int file = sFile; j < stepCount; dFile > sFile ? file++ : file--) {
-    if (file != sFile)
-      info.fileSteps[j++] = file;  
-  }
   return true;
 };
 
-Queen::Queen(string player) : ChessPiece(player, QUEEN) {
-  // moveRange = MAX_RANGE;
-  // maxPossiblePositions = 28;
-};
+Queen::Queen(string player) : ChessPiece(player, QUEEN) {};
 
 bool Queen::rules(const char * src, const char * dest, struct move_info info, bool capture) {
   int sRank, sFile, dRank, dFile;
   getIndex(src, sRank, sFile);
   getIndex(dest, dRank, dFile);
-  int & stepCount = *info.stepCount;
   
   if (dFile == sFile) {
-    // Vertical move
-    stepCount = dRank > sRank ? dRank - sRank : sRank - dRank;
-    int i = 0;
-    for(int rank = sRank; i < stepCount; dRank > sRank ? rank++ : rank--) {
-      // Assign to rankSteps and fileSteps the index of steps btw src and dest
-      if (rank != sRank) {
-        info.rankSteps[i] = rank;
-        info.fileSteps[i] = dFile;
-        ++i;
-      }
-    }
+    getVerticalPath(sRank, dRank, dFile, info);
   } else if (dRank == sRank) {
-    // Horizontal move
-    stepCount = dFile > sFile ? dFile - sFile : sFile - dFile;
-    int i = 0;
-    for(int file = sFile; i < stepCount; dFile > sFile ? file++ : file--) {
-      if (file != sFile) {
-        info.fileSteps[i] = file;
-        info.rankSteps[i] = dRank;
-        ++i;
-      }
-    }
+    getHorizontalPath(sFile, dFile, dRank, info);
   } else {
-    // Diagonal move
     int const rankDistance = dRank > sRank ? dRank - sRank : sRank - dRank;
     int const fileDistance = dFile > sFile ? dFile - sFile : sFile - dFile;
-    
     // The horizontal and vertical distance must be equal for diagonal movement
     if (rankDistance != fileDistance)
       return false;
 
-    stepCount = rankDistance;
-    int i = 0;
-    for (int rank = sRank; i < stepCount; dRank > sRank ? rank++ : rank--) {
-      if (rank != sRank)
-	      info.rankSteps[i++] = rank;  
-    }
-    
-    int j = 0;
-    for (int file = sFile; j < stepCount; dFile > sFile ? file++ : file--) {
-      if (file != sFile)
-	      info.fileSteps[j++] = file;  
-    }
+    *info.stepCount = rankDistance;
+    getDiagonalPath(sRank, dRank, sFile, dFile, info);
   }
   return true;
 };
 
-King::King(string player) : ChessPiece(player, KING) {
-  // moveRange = 3;
-  // maxPossiblePositions = 8;
-};
+King::King(string player) : ChessPiece(player, KING) {};
 
 bool King::rules(const char * src, const char * dest, struct move_info info, bool capture) {
   int sRank, sFile, dRank, dFile;
@@ -247,15 +202,7 @@ bool King::rules(const char * src, const char * dest, struct move_info info, boo
     if (stepCount == 2 && !moved && !capture) {
       // Set data member 'castling' to true
       castling = true;
-      int i = 0;
-      for(int file = sFile; i < stepCount; dFile > sFile ? file++ : file--) {
-        // Assign to rankSteps and fileSteps the index of steps btw src and dest
-        if (file != sFile) {
-          info.fileSteps[i] = file;
-          info.rankSteps[i] = dRank;
-          ++i;
-        }
-      }
+      getHorizontalPath(sFile, dFile, dRank, info);
       return true;
     }
     if (stepCount != 1)

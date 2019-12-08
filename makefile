@@ -1,5 +1,5 @@
-chess: ChessMain.o ChessBoard.o ChessPiece.o general.o
-	g++ ChessMain.o ChessBoard.o ChessPiece.o general.o -o chess
+chess: ChessMain.o ChessBoard.o ChessPiece.o utils.o
+	g++ ChessMain.o ChessBoard.o ChessPiece.o utils.o -o chess
 
 ChessMain.o: ChessMain.cpp ChessBoard.h
 	g++ -g -Wall -c ChessMain.cpp
@@ -7,11 +7,11 @@ ChessMain.o: ChessMain.cpp ChessBoard.h
 ChessBoard.o: ChessBoard.cpp ChessBoard.h ChessPiece.h
 	g++ -g -Wall -c ChessBoard.cpp
 
-ChessPiece.o: ChessPiece.cpp ChessPiece.h general.h
+ChessPiece.o: ChessPiece.cpp ChessPiece.h utils.h
 	g++ -g -Wall -c ChessPiece.cpp
 
-general.o: general.cpp general.h
-	g++ -g -Wall -c general.cpp
+utils.o: utils.cpp utils.h
+	g++ -g -Wall -c utils.cpp
 
 clean:
 	rm -f *.o chess

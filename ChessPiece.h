@@ -1,5 +1,5 @@
 #include <string>
-#include "general.h"
+#include "utils.h"
 
 /* 
  * Stores the path taken by the piece to move from src to dest
@@ -12,6 +12,16 @@ struct move_info {
 };
 
 class ChessPiece{
+ protected:
+  /* 
+   * These functions get the path btw the source(s-) and destination(d-) index:
+   * assign to rankSteps and fileSteps(in move_info) the index of each step
+   * assign number of steps btw src and dest to stepCount(in move_info)
+   * */
+  void getVerticalPath(int sRank, int dRank, int file, struct move_info info);
+  void getHorizontalPath(int sFile, int dFile, int rank, struct move_info info);
+  void getDiagonalPath(int sRank, int dRank, int sFile, int dFile, struct move_info info);
+
  public:
   // "White" / "Black"
   std::string player;
@@ -20,9 +30,6 @@ class ChessPiece{
   // Set to true once the piece is moved
   bool moved = false;
 
-  // TODO: need these?
-  // int moveRange = 0;
-  // int maxPossiblePositions = 0;
   /* 
    * ChessPiece constructor
    * initialises data members 'player' & 'type'

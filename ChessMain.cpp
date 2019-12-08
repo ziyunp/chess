@@ -10,6 +10,23 @@ int main() {
 
 	ChessBoard cb;
 	cout << '\n';
+	cb.submitMove("E2", "E3");
+	cout << '\n';
+
+	cb.submitMove("A7", "A5");
+	cout << '\n';
+
+	cb.submitMove("E3", "E5");
+	cout << '\n';
+
+	cb.submitMove("A8", "A6");
+	cout << '\n';
+
+	cb.submitMove("H5", "A5");
+	cout << '\n';
+
+	cb.submitMove("H7", "H5");
+	cout << '\n';
 
 	cb.submitMove("E2", "E3");
 	cout << '\n';
