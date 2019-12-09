@@ -1,4 +1,5 @@
 #include "ChessPiece.h"
+#include <iostream>
 using namespace std;
 
 ChessPiece::ChessPiece(string player, string type) : player(player), type(type) {};
@@ -82,8 +83,9 @@ bool Pawn::rules(const char * src, const char * dest, struct move_info info, boo
       if (stepCount > 2)
 	      return false;
       if (stepCount == 2) {
-        info.rankSteps[0] = sRank - 1;
-        info.fileSteps[0] = sFile;
+        getVerticalPath (sRank, dRank, dFile, info);
+        // info.rankSteps[0] = sRank - 1;
+        // info.fileSteps[0] = sFile;
       }
     } else {
       if (stepCount != 1)
